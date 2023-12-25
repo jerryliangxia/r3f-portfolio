@@ -4,6 +4,7 @@ import Model from "./Model.jsx";
 import { Suspense } from "react";
 import Placeholder from "./Placeholder.jsx";
 import Hamburger from "./Hamburger.jsx";
+import Fox from "./Fox.jsx";
 
 export default function Experience() {
   return (
@@ -12,6 +13,7 @@ export default function Experience() {
       <Suspense fallback={<Placeholder position-y={0.5} scale={[2, 3, 2]} />}>
         <Hamburger scale={0.35} />
       </Suspense>
+      <Fox />
       <OrbitControls makeDefault />
       <directionalLight
         castShadow
