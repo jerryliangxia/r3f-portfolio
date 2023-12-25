@@ -1,5 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 import {
+  Stage,
   Lightformer,
   Environment,
   Sky,
@@ -62,7 +63,7 @@ export default function Experience() {
         }}
         files="./environmentMaps/drakensberg_solitary_mountain_puresky_4k.hdr"
       > */}
-      <Environment
+      {/* <Environment
         preset="sunset"
         ground={{
           height: envMapHeight,
@@ -70,15 +71,7 @@ export default function Experience() {
           scale: envMapScale,
         }}
       >
-        {/* <color args={["#000000"]} attach="background" />
-        <Lightformer
-          position-z={-5}
-          scale={5}
-          color="red"
-          intensity={10}
-          form="ring"
-        /> */}
-      </Environment>
+      </Environment> */}
 
       {/* <directionalLight
         ref={directionalLight}
@@ -93,7 +86,7 @@ export default function Experience() {
         shadow-camera-bottom={-5}
         shadow-camera-left={-5}
       /> */}
-      <ContactShadows
+      {/* <ContactShadows
         position={[0, -0.99, 0]}
         scale={10}
         resolution={512}
@@ -102,7 +95,7 @@ export default function Experience() {
         opacity={opacity}
         blur={blur}
         frames={1} // bake the shadow once at the beginning
-      />
+      /> */}
       {/* <AccumulativeShadows
         position={[0, -0.99, 0]}
         scale={10}
@@ -123,21 +116,22 @@ export default function Experience() {
       </AccumulativeShadows> */}
       {/* <ambientLight intensity={1.5} /> */}
 
-      <mesh castShadow position-y={1} position-x={-2}>
-        <sphereGeometry />
-        <meshStandardMaterial
-          color="orange"
-          envMapIntensity={envMapIntensity}
-        />
-      </mesh>
+      <Stage
+        shadows={{ type: "contact", opacity: 0.2, blur: 3 }}
+        environment="sunset"
+        preset="portrait"
+        intensity={6}
+      >
+        <mesh position-y={1} position-x={-2}>
+          <sphereGeometry />
+          <meshStandardMaterial color="orange" />
+        </mesh>
 
-      <mesh castShadow ref={cube} position-y={1} position-x={2} scale={1.5}>
-        <boxGeometry />
-        <meshStandardMaterial
-          color="mediumpurple"
-          envMapIntensity={envMapIntensity}
-        />
-      </mesh>
+        <mesh ref={cube} position-y={1} position-x={2} scale={1.5}>
+          <boxGeometry />
+          <meshStandardMaterial color="mediumpurple" />
+        </mesh>
+      </Stage>
 
       {/* <mesh receiveShadow position-y={0} rotation-x={-Math.PI * 0.5} scale={10}>
         <planeGeometry />
