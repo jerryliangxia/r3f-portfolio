@@ -1,5 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import {
+  Lightformer,
+  Environment,
   Sky,
   ContactShadows,
   RandomizedLight,
@@ -27,6 +29,13 @@ export default function Experience() {
   const { sunPosition } = useControls("sky", {
     sunPosition: { value: [1, 2, 3] },
   });
+  const { envMapIntensity, envMapHeight, envMapRadius, envMapScale } =
+    useControls("environment map", {
+      envMapIntensity: { value: 7, min: 0, max: 12 },
+      envMapHeight: { value: 7, min: 0, max: 100 },
+      envMapRadius: { value: 28, min: 10, max: 1000 },
+      envMapScale: { value: 100, min: 10, max: 1000 },
+    });
 
   useFrame((state, delta) => {
     // const time = state.clock.elapsedTime;
@@ -36,14 +45,42 @@ export default function Experience() {
 
   return (
     <>
-      <Sky sunPosition={sunPosition} />
+      {/* <Sky sunPosition={sunPosition} /> */}
       {/* <Sky /> */}
       <Perf position="top-left" />
       {/* <BakeShadows /> */}
       {/* <SoftShadows size={25} samples={10} focus={0} /> */}
       <OrbitControls makeDefault />
+      {/* remove the background by commenting it out */}
+      {/* <Environment
+        background
+        // preset="sunset"
+        ground={{
+          height: envMapHeight,
+          radius: envMapRadius,
+          scale: envMapScale,
+        }}
+        files="./environmentMaps/drakensberg_solitary_mountain_puresky_4k.hdr"
+      > */}
+      <Environment
+        preset="sunset"
+        ground={{
+          height: envMapHeight,
+          radius: envMapRadius,
+          scale: envMapScale,
+        }}
+      >
+        {/* <color args={["#000000"]} attach="background" />
+        <Lightformer
+          position-z={-5}
+          scale={5}
+          color="red"
+          intensity={10}
+          form="ring"
+        /> */}
+      </Environment>
 
-      <directionalLight
+      {/* <directionalLight
         ref={directionalLight}
         position={sunPosition}
         intensity={4.5}
@@ -55,7 +92,7 @@ export default function Experience() {
         shadow-camera-right={5}
         shadow-camera-bottom={-5}
         shadow-camera-left={-5}
-      />
+      /> */}
       <ContactShadows
         position={[0, -0.99, 0]}
         scale={10}
@@ -84,27 +121,31 @@ export default function Experience() {
           bias={0.001}
         />
       </AccumulativeShadows> */}
-      <ambientLight intensity={1.5} />
+      {/* <ambientLight intensity={1.5} /> */}
 
-      <mesh castShadow position-x={-2}>
+      <mesh castShadow position-y={1} position-x={-2}>
         <sphereGeometry />
-        <meshStandardMaterial color="orange" />
+        <meshStandardMaterial
+          color="orange"
+          envMapIntensity={envMapIntensity}
+        />
       </mesh>
 
-      <mesh castShadow ref={cube} position-x={2} scale={1.5}>
+      <mesh castShadow ref={cube} position-y={1} position-x={2} scale={1.5}>
         <boxGeometry />
-        <meshStandardMaterial color="mediumpurple" />
+        <meshStandardMaterial
+          color="mediumpurple"
+          envMapIntensity={envMapIntensity}
+        />
       </mesh>
 
-      <mesh
-        // receiveShadow
-        position-y={-1}
-        rotation-x={-Math.PI * 0.5}
-        scale={10}
-      >
+      {/* <mesh receiveShadow position-y={0} rotation-x={-Math.PI * 0.5} scale={10}>
         <planeGeometry />
-        <meshStandardMaterial color="greenyellow" />
-      </mesh>
+        <meshStandardMaterial
+          color="greenyellow"
+          envMapIntensity={envMapIntensity}
+        />
+      </mesh> */}
     </>
   );
 }
