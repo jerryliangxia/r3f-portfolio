@@ -1,111 +1,86 @@
+import { useFrame } from "@react-three/fiber";
 import {
-  MeshReflectorMaterial,
-  Float,
-  Text,
-  Html,
-  PivotControls,
-  TransformControls,
+  RandomizedLight,
+  AccumulativeShadows,
+  SoftShadows,
+  BakeShadows,
+  useHelper,
   OrbitControls,
 } from "@react-three/drei";
 import { useRef } from "react";
-import { button, useControls } from "leva";
 import { Perf } from "r3f-perf";
+import * as THREE from "three";
 
 export default function Experience() {
-  const { perfVisible } = useControls("performance", {
-    perfVisible: true,
-  });
-  const { position, color, visible } = useControls("sphere", {
-    position: {
-      value: { x: -2, y: 0 },
-      step: 0.01,
-      joystick: "invertY",
-    },
-    color: "#ff0000",
-    visible: true,
-    myInterval: {
-      min: 0,
-      max: 10,
-      value: [4, 5],
-    },
-    clickMe: button(() => {
-      console.log("ok");
-    }),
-    choice: { options: ["a", "b", "c"] },
-  });
-
-  const { scale } = useControls("cube", {
-    scale: {
-      value: 1.5,
-      step: 0.01,
-      min: 0,
-      max: 5,
-    },
-  });
-
   const cube = useRef();
-  const sphere = useRef();
+
+  const directionalLight = useRef();
+  // useHelper(directionalLight, THREE.DirectionalLightHelper, 1);
+
+  useFrame((state, delta) => {
+    const time = state.clock.elapsedTime;
+    cube.current.position.x = 2 + Math.sin(time);
+    cube.current.rotation.y += delta * 0.2;
+  });
+
   return (
     <>
-      {perfVisible && <Perf position="top-left" />}
+      <Perf position="top-left" />
+      {/* <BakeShadows /> */}
+      {/* <SoftShadows size={25} samples={10} focus={0} /> */}
       <OrbitControls makeDefault />
-      <directionalLight position={[1, 2, 3]} intensity={4.5} />
-      <ambientLight intensity={1.5} />
-      <Float speed={5} floatIntensity={2}>
-        <Text
-          font="./bangers-v20-latin-regular.woff"
-          fontSize={1}
-          color="salmon"
-          position-y={2}
-          maxWidth={2}
-          textAlign="center"
-        >
-          JERRY XIA
-        </Text>
-      </Float>
 
-      <PivotControls
-        anchor={[0, 0, 0]}
-        depthTest={false}
-        lineWidth={4}
-        axisColors={["#9381ff", "#ff4d6d", "#7ae582"]}
-        scale={100}
-        fixed={true}
+      <directionalLight
+        ref={directionalLight}
+        position={[1, 2, 3]}
+        intensity={4.5}
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-near={1}
+        shadow-camera-far={10}
+        shadow-camera-top={5}
+        shadow-camera-right={5}
+        shadow-camera-bottom={-5}
+        shadow-camera-left={-5}
+      />
+      <AccumulativeShadows
+        position={[0, -0.99, 0]}
+        scale={10}
+        color="#316d39"
+        opacity={0.8}
+        frames={Infinity}
+        temporal
+        blend={100}
       >
-        <mesh
-          ref={sphere}
-          visible={visible}
-          position={[position.x, position.y, 0]}
-        >
-          <sphereGeometry />
-          <meshStandardMaterial color={color} />
-          <Html
-            position={[1, 1, 0]}
-            wrapperClass="label"
-            distanceFactor={8}
-            occlude={[sphere, cube]}
-          >
-            Text Pop-Up
-          </Html>
-        </mesh>
-      </PivotControls>
+        <RandomizedLight
+          amount={8}
+          radius={1}
+          ambient={0.5}
+          intensity={3}
+          position={[1, 2, 3]}
+          bias={0.001}
+        />
+      </AccumulativeShadows>
+      <ambientLight intensity={1.5} />
 
-      <mesh ref={cube} position-x={2} scale={scale}>
+      <mesh castShadow position-x={-2}>
+        <sphereGeometry />
+        <meshStandardMaterial color="orange" />
+      </mesh>
+
+      <mesh castShadow ref={cube} position-x={2} scale={1.5}>
         <boxGeometry />
         <meshStandardMaterial color="mediumpurple" />
       </mesh>
 
-      <TransformControls object={cube} />
-
-      <mesh position-y={-1} rotation-x={-Math.PI * 0.5} scale={10}>
+      <mesh
+        // receiveShadow
+        position-y={-1}
+        rotation-x={-Math.PI * 0.5}
+        scale={10}
+      >
         <planeGeometry />
-        <MeshReflectorMaterial
-          resolution={512}
-          blur={[1000, 1000]}
-          mixBlur={1}
-          mirror={0.5}
-          color="greenyellow"
-        />
+        <meshStandardMaterial color="greenyellow" />
       </mesh>
     </>
   );
