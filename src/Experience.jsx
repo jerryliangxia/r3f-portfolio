@@ -1,5 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import {
+  Sky,
+  ContactShadows,
   RandomizedLight,
   AccumulativeShadows,
   SoftShadows,
@@ -10,21 +12,32 @@ import {
 import { useRef } from "react";
 import { Perf } from "r3f-perf";
 import * as THREE from "three";
+import { useControls } from "leva";
 
 export default function Experience() {
   const cube = useRef();
 
   const directionalLight = useRef();
-  // useHelper(directionalLight, THREE.DirectionalLightHelper, 1);
+  useHelper(directionalLight, THREE.DirectionalLightHelper, 1);
+  const { color, opacity, blur } = useControls("contact shadows", {
+    color: "#1d8f75",
+    opacity: { value: 0.4, min: 0, max: 1 },
+    blur: { value: 2.8, min: 0, max: 10 },
+  });
+  const { sunPosition } = useControls("sky", {
+    sunPosition: { value: [1, 2, 3] },
+  });
 
   useFrame((state, delta) => {
-    const time = state.clock.elapsedTime;
-    cube.current.position.x = 2 + Math.sin(time);
+    // const time = state.clock.elapsedTime;
+    // cube.current.position.x = 2 + Math.sin(time);
     cube.current.rotation.y += delta * 0.2;
   });
 
   return (
     <>
+      <Sky sunPosition={sunPosition} />
+      {/* <Sky /> */}
       <Perf position="top-left" />
       {/* <BakeShadows /> */}
       {/* <SoftShadows size={25} samples={10} focus={0} /> */}
@@ -32,7 +45,7 @@ export default function Experience() {
 
       <directionalLight
         ref={directionalLight}
-        position={[1, 2, 3]}
+        position={sunPosition}
         intensity={4.5}
         castShadow
         shadow-mapSize={[1024, 1024]}
@@ -43,7 +56,17 @@ export default function Experience() {
         shadow-camera-bottom={-5}
         shadow-camera-left={-5}
       />
-      <AccumulativeShadows
+      <ContactShadows
+        position={[0, -0.99, 0]}
+        scale={10}
+        resolution={512}
+        far={5}
+        color={color}
+        opacity={opacity}
+        blur={blur}
+        frames={1} // bake the shadow once at the beginning
+      />
+      {/* <AccumulativeShadows
         position={[0, -0.99, 0]}
         scale={10}
         color="#316d39"
@@ -60,7 +83,7 @@ export default function Experience() {
           position={[1, 2, 3]}
           bias={0.001}
         />
-      </AccumulativeShadows>
+      </AccumulativeShadows> */}
       <ambientLight intensity={1.5} />
 
       <mesh castShadow position-x={-2}>
