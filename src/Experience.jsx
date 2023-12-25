@@ -8,12 +8,46 @@ import {
   OrbitControls,
 } from "@react-three/drei";
 import { useRef } from "react";
+import { button, useControls } from "leva";
+import { Perf } from "r3f-perf";
 
 export default function Experience() {
+  const { perfVisible } = useControls("performance", {
+    perfVisible: true,
+  });
+  const { position, color, visible } = useControls("sphere", {
+    position: {
+      value: { x: -2, y: 0 },
+      step: 0.01,
+      joystick: "invertY",
+    },
+    color: "#ff0000",
+    visible: true,
+    myInterval: {
+      min: 0,
+      max: 10,
+      value: [4, 5],
+    },
+    clickMe: button(() => {
+      console.log("ok");
+    }),
+    choice: { options: ["a", "b", "c"] },
+  });
+
+  const { scale } = useControls("cube", {
+    scale: {
+      value: 1.5,
+      step: 0.01,
+      min: 0,
+      max: 5,
+    },
+  });
+
   const cube = useRef();
   const sphere = useRef();
   return (
     <>
+      {perfVisible && <Perf position="top-left" />}
       <OrbitControls makeDefault />
       <directionalLight position={[1, 2, 3]} intensity={4.5} />
       <ambientLight intensity={1.5} />
@@ -26,7 +60,7 @@ export default function Experience() {
           maxWidth={2}
           textAlign="center"
         >
-          I LOVE R3F
+          JERRY XIA
         </Text>
       </Float>
 
@@ -38,21 +72,25 @@ export default function Experience() {
         scale={100}
         fixed={true}
       >
-        <mesh ref={sphere} position-x={-2}>
+        <mesh
+          ref={sphere}
+          visible={visible}
+          position={[position.x, position.y, 0]}
+        >
           <sphereGeometry />
-          <meshStandardMaterial color="orange" />
+          <meshStandardMaterial color={color} />
           <Html
             position={[1, 1, 0]}
             wrapperClass="label"
             distanceFactor={8}
             occlude={[sphere, cube]}
           >
-            That's a sphere 👍
+            Text Pop-Up
           </Html>
         </mesh>
       </PivotControls>
 
-      <mesh ref={cube} position-x={2} scale={1.5}>
+      <mesh ref={cube} position-x={2} scale={scale}>
         <boxGeometry />
         <meshStandardMaterial color="mediumpurple" />
       </mesh>
